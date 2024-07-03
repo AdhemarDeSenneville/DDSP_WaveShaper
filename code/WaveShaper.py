@@ -8,11 +8,21 @@ class WaveShaper(nn.Module):
         self.n = n
         self.init_weights()
     
-    def forward_symetric(self, x): 
+    def forward(self, x): 
         # for a signal where -1 < x < 1
-        return self.forward(x) - self.forward(-x)
 
-    def forward(self, x):
+        original_shape = x.shape
+        x = x.view(-1, 1)
+
+        # Apply the symetric run method
+        x = self.run(x) - self.run(-x)
+        
+        # Reshape back to the original form
+        x = x.view(original_shape)
+
+        return x
+
+    def run(self, x):
         batch = x.shape[0]
         x = torch.clamp(x, 0, 1)
         
